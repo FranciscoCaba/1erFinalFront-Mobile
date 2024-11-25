@@ -8,6 +8,8 @@ import {
   TextInput,
   Button,
   Alert,
+  Modal,
+  TouchableOpacity,
 } from "react-native";
 import { Screen } from "../../components/mios/Screen";
 import { useEffect, useState } from "react";
@@ -21,6 +23,8 @@ import {
   resetCarrito,
 } from "../../lib/backend";
 import { RadioButton } from "react-native-paper";
+import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
 
 export default function VerCarrito() {
   const [carrito, setCarrito] = useState([]);
@@ -32,22 +36,26 @@ export default function VerCarrito() {
   const [total, setTotal] = useState(0);
   const [tipoOperacion, setTipoOperacion] = useState("");
   const [direccion, setDireccion] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [isDeliveryModalVisible, setIsDeliveryModalVisible] = useState(false);
+  const [tempDireccion, setTempDireccion] = useState("");
+  const [locationPermission, setLocationPermission] = useState(null);
 
   useEffect(() => {
     setProductos(getProductos());
     const carritoItems = getCarrito();
     setCarrito(carritoItems);
 
-    // Calcular el total
-    const totalVenta = carritoItems.reduce(
-      (sum, item) => sum + item.precio,
-      // eslint-disable-next-line prettier/prettier
-      0
-    );
+    const totalVenta = carritoItems.reduce((sum, item) => sum + item.precio, 0);
     setTotal(totalVenta);
   }, []);
 
-  const handleFinalizarOrden = async () => {
+  const handleMapPress = (event) => {
+    const { coordinate } = event.nativeEvent;
+    setSelectedLocation(coordinate);
+  };
+
+  const handlePreFinalizarOrden = async () => {
     if (!cedula) {
       Alert.alert("Error", "Por favor ingrese un número de cédula");
       return;
@@ -65,10 +73,34 @@ export default function VerCarrito() {
       return;
     }
 
+    // Si es Pickup, finalizar directamente
+    if (tipoOperacion === "PickUp") {
+      await finalizarOrden();
+      return;
+    }
+
+    // Si es Delivery, mostrar modal para dirección y ubicación
+    setIsDeliveryModalVisible(true);
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    setLocationPermission(status === "granted");
+  };
+
+  const finalizarOrden = async (passedDireccion = tempDireccion) => {
+    if (tipoOperacion === "Delivery" && !selectedLocation) {
+      Alert.alert("Error", "Por favor seleccione una ubicación en el mapa");
+      return;
+    }
+
+    if (tipoOperacion === "Delivery" && !passedDireccion) {
+      Alert.alert("Error", "Por favor ingrese una dirección");
+      return;
+    }
+
     let cliente = {};
 
     try {
-      // Si es un cliente nuevo, registrarlo
+      const exists = clienteExists(parseInt(cedula));
+
       if (!exists) {
         cliente = addCliente({
           cedula: parseInt(cedula),
@@ -79,7 +111,6 @@ export default function VerCarrito() {
         cliente = getOneCliente(cedula);
       }
 
-      // Preparar datos para la venta
       const ventaData = {
         productos: carrito.map((item) => ({
           idProducto: item.id,
@@ -92,40 +123,55 @@ export default function VerCarrito() {
           tipoOperacion,
         },
       };
-
       if (tipoOperacion === "Delivery") {
         ventaData.venta = {
           ...ventaData.venta,
-          direccion,
+          direccion: passedDireccion,
+          ubicacion: selectedLocation,
         };
       }
 
-      // Guardar la venta
       guardarVenta(ventaData);
-
-      console.log(ventaData);
 
       Alert.alert("Éxito", "La orden ha sido finalizada correctamente", [
         {
           text: "OK",
           onPress: () => {
-            setShowClientForm(false);
-            setCarrito([]);
-            setTotal(0);
-            setCedula("");
-            setNombre("");
-            setApellido("");
-            setDireccion("");
-            setTipoOperacion("");
-            resetCarrito();
-            router.back();
+            resetFormAndNavigate();
           },
         },
       ]);
-      // eslint-disable-next-line no-unused-vars
     } catch (error) {
       Alert.alert("Error", error.message);
     }
+  };
+
+  const resetFormAndNavigate = () => {
+    setShowClientForm(false);
+    setCarrito([]);
+    setTotal(0);
+    setCedula("");
+    setNombre("");
+    setApellido("");
+    setDireccion("");
+    setTipoOperacion("");
+    setSelectedLocation(null);
+    setIsDeliveryModalVisible(false);
+    setTempDireccion("");
+    resetCarrito();
+    router.back();
+  };
+
+  const handleConfirmDeliveryDetails = () => {
+    if (!tempDireccion) {
+      Alert.alert("Error", "Por favor ingrese una dirección");
+      return;
+    }
+    if (!selectedLocation) {
+      Alert.alert("Error", "Por favor seleccione una ubicación en el mapa");
+      return;
+    }
+    finalizarOrden(tempDireccion);
   };
 
   return (
@@ -187,20 +233,6 @@ export default function VerCarrito() {
             <Text style={styles.tipoOperacionText}>Delivery</Text>
           </View>
         </View>
-        {tipoOperacion === "Delivery" ? (
-          <View>
-            <Text style={styles.textoBlanco}>Dirección:</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Ingrese su dirección"
-              value={direccion}
-              onChangeText={setDireccion}
-              placeholderTextColor="#666"
-            />
-          </View>
-        ) : (
-          ""
-        )}
       </View>
 
       <View style={[styles.filas, { marginTop: 10 }]}>
@@ -252,12 +284,70 @@ export default function VerCarrito() {
           <View style={styles.buttonContainer}>
             <Button
               title="Finalizar Orden"
-              onPress={handleFinalizarOrden}
+              onPress={handlePreFinalizarOrden}
               color="#27498c"
+              disabled={!tipoOperacion}
             />
           </View>
         </>
       )}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isDeliveryModalVisible}
+        onRequestClose={() => setIsDeliveryModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Detalles de Entrega</Text>
+
+            <Text style={styles.textoBlanco}>Dirección:</Text>
+            <TextInput
+              style={[styles.input, { width: "100%" }]}
+              placeholder="Ingrese su dirección"
+              value={tempDireccion}
+              onChangeText={setTempDireccion}
+              placeholderTextColor="#666"
+            />
+
+            <Text style={styles.textoBlanco}>Seleccione ubicación:</Text>
+            <MapView
+              showsUserLocation
+              showsMyLocationButton
+              style={styles.map}
+              onPress={handleMapPress}
+              initialRegion={{
+                latitude: -25.2988,
+                longitude: -57.6172,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}
+            >
+              {selectedLocation && (
+                <Marker
+                  coordinate={selectedLocation}
+                  title="Ubicación seleccionada"
+                />
+              )}
+            </MapView>
+
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setIsDeliveryModalVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.confirmButton]}
+                onPress={handleConfirmDeliveryDetails}
+              >
+                <Text style={styles.modalButtonText}>Confirmar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </Screen>
   );
 }
@@ -334,5 +424,52 @@ const styles = StyleSheet.create({
   tipoOperacionText: {
     color: "white",
     fontSize: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    width: "90%",
+    backgroundColor: "#27498c",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalTitle: {
+    color: "white",
+    fontSize: 20,
+    marginBottom: 15,
+    fontWeight: "bold",
+  },
+  map: {
+    width: "100%",
+    height: 200,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  modalButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 10,
+  },
+  modalButton: {
+    padding: 10,
+    borderRadius: 5,
+    width: "48%",
+    alignItems: "center",
+  },
+  cancelButton: {
+    backgroundColor: "red",
+  },
+  confirmButton: {
+    backgroundColor: "green",
+  },
+  modalButtonText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });

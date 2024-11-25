@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Screen } from "../../components/mios/Screen";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { FlatList, StyleSheet, Text, View } from "react-native";
+import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
 import { getDetallesVenta, getProductos, getVenta } from "../../lib/backend";
 
 export default function SaleDetailsScreen() {
@@ -9,16 +11,23 @@ export default function SaleDetailsScreen() {
   const [saleDetails, setSaleDetails] = useState([]);
   const [productos, setProductos] = useState([]);
   const [venta, setVenta] = useState({});
+  const [locationPermission, setLocationPermission] = useState(null);
 
   useEffect(() => {
     setProductos(getProductos());
     fetchSaleDetails();
-  }, [idVenta]);
+    requestLocationPermission();
+  }, []);
+
+  const requestLocationPermission = async () => {
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    setLocationPermission(status === "granted");
+  };
 
   const fetchSaleDetails = () => {
     const data = getDetallesVenta(idVenta);
-    setVenta(getVenta(idVenta));
-
+    const saleData = getVenta(idVenta);
+    setVenta(saleData);
     setSaleDetails(data);
   };
 
@@ -31,29 +40,66 @@ export default function SaleDetailsScreen() {
           headerTitle: "Detalles de Venta",
         }}
       />
-      
+
       <View style={styles.container}>
-        <View style={{flexDirection: "row", justifyContent: ""}}>
-          <Text style={[styles.textoBlanco,
-                        {
-                          textDecorationLine: "underline",
-                          fontWeight: "bold"
-                          }]}>Tipo Operación</Text>
+        <View style={{ flexDirection: "row", justifyContent: "" }}>
+          <Text
+            style={[
+              styles.textoBlanco,
+              {
+                textDecorationLine: "underline",
+                fontWeight: "bold",
+              },
+            ]}
+          >
+            Tipo Operación
+          </Text>
           <Text style={[styles.textoBlanco]}>: {venta.tipoOperacion}</Text>
         </View>
-        {
-          venta.tipoOperacion === "PickUp" ?
+        {venta.tipoOperacion === "PickUp" ? (
           ""
-          :
-          <View style={{flexDirection: "row", justifyContent: ""}}>
-            <Text style={[styles.textoBlanco,
-                          {
-                            textDecorationLine: "underline",
-                            fontWeight: "bold"
-                            }]}>Dirección</Text>
-            <Text style={[styles.textoBlanco]}>: {venta.direccion}</Text>
-          </View>
-        }
+        ) : (
+          <>
+            <View style={{ flexDirection: "row", justifyContent: "" }}>
+              <Text
+                style={[
+                  styles.textoBlanco,
+                  {
+                    textDecorationLine: "underline",
+                    fontWeight: "bold",
+                  },
+                ]}
+              >
+                Dirección
+              </Text>
+              <Text style={[styles.textoBlanco]}>: {venta.direccion}</Text>
+            </View>
+            {console.log(venta.ubicacion)}
+            {venta.ubicacion && (
+              <View style={styles.mapContainer}>
+                <MapView
+                  style={styles.map}
+                  initialRegion={{
+                    latitude: venta.ubicacion.latitude,
+                    longitude: venta.ubicacion.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  }}
+                  showsUserLocation
+                  showsMyLocationButton
+                >
+                  <Marker
+                    coordinate={{
+                      latitude: venta.ubicacion.latitude,
+                      longitude: venta.ubicacion.longitude,
+                    }}
+                    title="Ubicación de la Entrega"
+                  />
+                </MapView>
+              </View>
+            )}
+          </>
+        )}
       </View>
 
       <View style={[styles.filas, { marginTop: 15 }]}>
@@ -205,5 +251,17 @@ const styles = StyleSheet.create({
   saleDetailsText: {
     color: "black",
     fontSize: 14,
+  },
+  mapContainer: {
+    width: "90%",
+    height: 200,
+    alignSelf: "center",
+    marginTop: 10,
+    borderRadius: 10,
+    overflow: "hidden",
+  },
+  map: {
+    width: "100%",
+    height: 200,
   },
 });

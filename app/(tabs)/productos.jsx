@@ -9,6 +9,7 @@ import {
   Text,
   View,
   TextInput,
+  Image,
 } from "react-native";
 import {
   getProductos,
@@ -77,14 +78,14 @@ export default function Producto() {
       </Link>
 
       <View style={styles.filas}>
-        <View style={[styles.celda, { flex: 0.5 }]}>
+        <View style={[styles.celda, { flex: 1 }]}>
           <Text
             style={[
               styles.texto,
               { fontWeight: "bold", fontStyle: "italic", fontSize: 14 },
             ]}
           >
-            {"ID"}
+            {"Imagen"}
           </Text>
         </View>
         <View style={[styles.celda, { flex: 1 }]}>
@@ -117,7 +118,17 @@ export default function Producto() {
             {"Precio"}
           </Text>
         </View>
-        <View style={[styles.celda, { flex: 2 }]}>
+        <View style={[styles.celda, { flex: 1 }]}>
+          <Text
+            style={[
+              styles.texto,
+              { fontWeight: "bold", fontStyle: "italic", fontSize: 14 },
+            ]}
+          >
+            {"Stock"}
+          </Text>
+        </View>
+        <View style={[styles.celda, { flex: 1 }]}>
           <Text
             style={[
               styles.texto,
@@ -147,8 +158,11 @@ export default function Producto() {
           renderItem={({ item }) =>
             item.activo ? (
               <View style={styles.filas}>
-                <View style={[styles.celda, { flex: 0.5 }]}>
-                  <Text style={[styles.texto]}>{item.id}</Text>
+                <View style={[styles.celda, { flex: 1 }]}>
+                  <Image
+                    source={{ uri: item.imagen }}
+                    style={styles.imagePreview}
+                  />
                 </View>
                 <View style={[styles.celda, { flex: 1 }]}>
                   <Text style={[styles.texto]}>{item.nombre}</Text>
@@ -161,30 +175,33 @@ export default function Producto() {
                 <View style={[styles.celda, { flex: 1 }]}>
                   <Text style={[styles.texto]}>{item.precioVenta}</Text>
                 </View>
+                <View style={[styles.celda, { flex: 1 }]}>
+                  <Text style={[styles.texto]}>{item.stock}</Text>
+                </View>
+                
                 <Link
                   asChild
+                  style={[styles.celda, { flex: 0.5 }]}
                   href={{
                     pathname: "/productos/editar",
                     params: {
-                      id: item.id,
-                      nombre: item.nombre,
-                      categoria: item.categoria,
-                      precioVenta: item.precioVenta,
+                      id: item.id
                     },
                   }}
                 >
-                  <Pressable style={styles.celda}>
+                  <Pressable>
                     <EditIcon color="black" />
                   </Pressable>
                 </Link>
                 <Link
                   asChild
+                  style={[styles.celda, { flex: 0.5 }]}
                   href={{
                     pathname: "/productos/eliminar",
                     params: { id: item.id, nombre: item.nombre },
                   }}
                 >
-                  <Pressable style={styles.celda}>
+                  <Pressable>
                     <DeleteIcon color="black" />
                   </Pressable>
                 </Link>
@@ -223,7 +240,7 @@ const styles = StyleSheet.create({
   },
   celda: {
     flex: 1,
-    height: 40,
+    height: 70,
     textAlign: "center",
     alignItems: "center",
     verticalAlign: "center",
@@ -241,5 +258,11 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     color: "black",
+  },
+  imagePreview: {
+    width: 45,
+    height: 60,
+    alignSelf: 'center',
+    borderRadius: 8,
   },
 });

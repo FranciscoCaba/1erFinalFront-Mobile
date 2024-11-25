@@ -9,6 +9,7 @@ import {
   Text,
   View,
   TextInput,
+  Image,
 } from "react-native";
 import { getCategorias, filtrarCategorias } from "../../lib/backend";
 import { Link } from "expo-router";
@@ -64,7 +65,7 @@ export default function Categoria() {
       </Link>
 
       <View style={styles.filas}>
-        <View style={styles.celda}>
+        <View style={[styles.celda, {flex: 0.5}]}>
           <Text
             style={[
               styles.texto,
@@ -72,6 +73,16 @@ export default function Categoria() {
             ]}
           >
             {"ID"}
+          </Text>
+        </View>
+        <View style={[styles.celda, {flex: 0.5}]}>
+          <Text
+            style={[
+              styles.texto,
+              { fontWeight: "bold", fontStyle: "italic", fontSize: 14 },
+            ]}
+          >
+            {"Icono"}
           </Text>
         </View>
         <View style={styles.celda}>
@@ -111,17 +122,23 @@ export default function Categoria() {
           renderItem={({ item }) =>
             item.activo ? (
               <View style={styles.filas}>
-                <View style={styles.celda}>
+                <View style={[styles.celda, {flex: 0.5}]}>
                   <Text style={[styles.texto]}>{item.id}</Text>
                 </View>
-                <View style={styles.celda}>
+                <View style={[styles.celda, {flex: 0.5}]}>
+                  <Image
+                    source={{ uri: item.icono }}
+                    style={styles.iconoPreview}
+                  />
+                </View>
+                <View style={[styles.celda, {flex: 1}]}>
                   <Text style={[styles.texto]}>{item.nombre}</Text>
                 </View>
                 <Link
                   asChild
                   href={{
                     pathname: "/categorias/editar",
-                    params: { id: item.id, nombre: item.nombre },
+                    params: { id: item.id },
                   }}
                 >
                   <Pressable style={styles.celda}>
@@ -191,5 +208,11 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     color: "black",
+  },
+  iconoPreview: {
+    width: 25,
+    height: 25,
+    alignSelf: 'center',
+    borderRadius: 8,
   },
 });

@@ -1,18 +1,48 @@
 import { router, Stack } from "expo-router";
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Screen } from "../../components/mios/Screen";
 import { useEffect, useState } from "react";
 import { addProducto, getCategorias } from "../../lib/backend";
 import Dropdown from "../../components/mios/Dropdown";
+import * as ImagePicker from 'expo-image-picker';
 
 export default function CrearProducto() {
   const [nombre, setNombre] = useState("");
   const [precioVenta, setPrecioVenta] = useState(0);
   const [categorias, setCategorias] = useState([]);
   const [selectedCategoria, setSelectedCategoria] = useState({});
+  const [imagen, setImagen] = useState(null);
+  const [stock, setStock] = useState(0);
+
+  const pickImage = async () => {
+    // Solicitar permisos
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Se necesitan permisos para acceder a la galería');
+      return;
+    }
+
+    // Abrir selector de imágenes
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [3, 4],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImagen(result.assets[0].uri);
+    }
+  };
 
   const crear = () => {
-    addProducto({ nombre, precioVenta, idCategoria: selectedCategoria.value });
+    addProducto({ 
+      nombre, 
+      precioVenta, 
+      idCategoria: selectedCategoria.value,
+      imagen: imagen,
+      stock
+    });
     router.back();
   };
 
@@ -59,6 +89,29 @@ export default function CrearProducto() {
           placeholder="Selecciona"
         />
 
+        <Text style={styles.texto}>Imagen del producto:</Text>
+        <Pressable
+          onPress={pickImage}
+          style={[styles.imagenButton, { marginBottom: 10 }]}
+        >
+          <Text style={styles.buttonText}>Seleccionar Imagen</Text>
+        </Pressable>
+
+        {imagen && (
+          <Image
+            source={{ uri: imagen }}
+            style={styles.imagePreview}
+          />
+        )}
+
+        <Text style={styles.texto}>Ingrese el stock:</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={setStock}
+          value={stock}
+          keyboardType="numeric"
+        />
+
         <Pressable
           onPressOut={() => crear()}
           style={({ pressed }) => [
@@ -84,12 +137,21 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     fontSize: 25,
   },
+  imagenButton: {
+    borderRadius: 8,
+    padding: 6,
+    marginTop: 10,
+    width: "70%",
+    alignSelf: "center",
+    backgroundColor: "white",
+  },
   button: {
     borderRadius: 8,
     padding: 6,
     marginTop: 10,
-    width: "30%",
+    width: "50%",
     alignSelf: "center",
+    backgroundColor: "white",
   },
   buttonText: {
     alignSelf: "center",
@@ -100,5 +162,12 @@ const styles = StyleSheet.create({
     height: 40,
     borderWidth: 1,
     padding: 10,
+  },
+  imagePreview: {
+    width: 150,
+    height: 200,
+    alignSelf: 'center',
+    marginVertical: 10,
+    borderRadius: 8,
   },
 });

@@ -17,15 +17,15 @@ export const InfoIcon = (props: any) => (
 );
 
 export const BoxIcon = (props: any) => (
-  <FontAwesome6 name="box-open" size={28} color="black" {...props} />
+  <FontAwesome6 name="box-open" size={24} color="black" {...props} />
 );
 
 export const SellIcon = (props: any) => (
-  <MaterialIcons name="sell" size={32} color="white" {...props} />
+  <MaterialIcons name="sell" size={30} color="white" {...props} />
 );
 
 export const CategoryIcon = (props: any) => (
-  <MaterialIcons name="text-snippet" size={32} color="black" {...props} />
+  <MaterialIcons name="text-snippet" size={30} color="black" {...props} />
 );
 
 export const AddIcon = (props: any) => (
@@ -33,11 +33,11 @@ export const AddIcon = (props: any) => (
 );
 
 export const EditIcon = (props: any) => (
-  <MaterialIcons name="edit" size={30} color="black" {...props} />
+  <MaterialIcons name="edit" size={20} color="black" {...props} />
 );
 
 export const DeleteIcon = (props: any) => (
-  <MaterialCommunityIcons name="delete" size={30} color="black" {...props} />
+  <MaterialCommunityIcons name="delete" size={20} color="black" {...props} />
 );
 
 export const AddCartIcon = (props: any) => (

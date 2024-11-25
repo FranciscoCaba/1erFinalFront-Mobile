@@ -7,6 +7,7 @@ import {
   Text,
   TextInput,
   View,
+  Image,
 } from "react-native";
 import { Screen } from "./Screen";
 import { useEffect, useState } from "react";
@@ -17,7 +18,8 @@ import { useIsFocused } from "@react-navigation/native";
 
 export function Main() {
   const [productos, setProductos] = useState([]);
-  const [categorias, setCategorias] = useState({}); // Para almacenar el mapeo de id -> nombre de categoría
+  // Para almacenar el mapeo de id -> nombre de categoría
+  const [categorias, setCategorias] = useState({});
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState("");
   const isFocused = useIsFocused();
@@ -44,7 +46,7 @@ export function Main() {
       const categoriasData = getCategorias();
       const categoriasMap = {};
       categoriasData.forEach((cat) => {
-        categoriasMap[cat?.id] = cat?.nombre;
+        categoriasMap[cat?.id] = cat;
       });
 
       setCategorias(categoriasMap);
@@ -72,16 +74,6 @@ export function Main() {
       </Link>
 
       <View style={styles.filas}>
-        <View style={[styles.celda, { flex: 0.5 }]}>
-          <Text
-            style={[
-              styles.texto,
-              { fontWeight: "bold", fontStyle: "italic", fontSize: 14 },
-            ]}
-          >
-            {"ID"}
-          </Text>
-        </View>
         <View style={[styles.celda, { flex: 1 }]}>
           <Text
             style={[
@@ -89,7 +81,7 @@ export function Main() {
               { fontWeight: "bold", fontStyle: "italic", fontSize: 14 },
             ]}
           >
-            {"Nombre"}
+            {"Producto"}
           </Text>
         </View>
         <View style={[styles.celda, { flex: 1 }]}>
@@ -112,14 +104,14 @@ export function Main() {
             {"Precio"}
           </Text>
         </View>
-        <View style={[styles.celda, { flex: 1 }]}>
+        <View style={[styles.celda, { flex: 0.5 }]}>
           <Text
             style={[
               styles.texto,
               { fontWeight: "bold", fontStyle: "italic", fontSize: 14 },
             ]}
           >
-            Acciones
+            Añadir
           </Text>
         </View>
       </View>
@@ -142,21 +134,27 @@ export function Main() {
           renderItem={({ item }) =>
             item.activo ? (
               <View style={styles.filas}>
-                <View style={[styles.celda, { flex: 0.5 }]}>
-                  <Text style={[styles.texto]}>{item.id}</Text>
+                <View style={[styles.celda, { flex: 1, display: "flex", flexDirection: "row"}]}>
+                  <Image
+                    source={{ uri: item.imagen }}
+                    style={[styles.image, {marginLeft: 4}]}
+                  />
+                  <Text style={[styles.texto, {flex: 3, marginRight: 4}]}>{item.nombre}</Text>
                 </View>
-                <View style={[styles.celda, { flex: 1 }]}>
-                  <Text style={[styles.texto]}>{item.nombre}</Text>
-                </View>
-                <View style={[styles.celda, { flex: 1 }]}>
-                  <Text style={[styles.texto]}>
-                    {categorias[item.idCategoria]}
+                <View style={[styles.celda, { flex: 1, display: "flex", flexDirection: "row"}]}>
+                  <Image
+                    source={{ uri: categorias[item.idCategoria].icono }}
+                    style={[styles.icono, {marginLeft: 4}]}
+                  />
+                  <Text style={[styles.texto, {flex: 3, marginRight: 4}]}>
+                    {categorias[item.idCategoria].nombre}
                   </Text>
                 </View>
                 <View style={[styles.celda, { flex: 1 }]}>
                   <Text style={[styles.texto]}>{item.precioVenta}</Text>
                 </View>
                 <Link
+                  style={[styles.celda, {flex: 0.5}]}
                   asChild
                   href={{
                     pathname: "/carrito/agregar",
@@ -167,7 +165,7 @@ export function Main() {
                     },
                   }}
                 >
-                  <Pressable style={styles.celda}>
+                  <Pressable>
                     <AddCartIcon color="black" />
                   </Pressable>
                 </Link>
@@ -206,7 +204,7 @@ const styles = StyleSheet.create({
   },
   celda: {
     flex: 1,
-    height: 40,
+    height: 50,
     textAlign: "center",
     alignItems: "center",
     verticalAlign: "center",
@@ -224,5 +222,17 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     color: "black",
+  },
+  image: {
+    width: 30,
+    height: 40,
+    marginRight: 4,
+    borderRadius: 8,
+  },
+  icono: {
+    width: 25,
+    height: 25,
+    marginRight: 4,
+    borderRadius: 8,
   },
 });

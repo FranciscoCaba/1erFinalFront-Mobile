@@ -8,7 +8,7 @@ import {
   TouchableWithoutFeedback,
   Platform,
 } from "react-native";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 
 type OptionItem = {
@@ -20,12 +20,14 @@ interface DropDownProps {
   data: OptionItem[];
   onChange: (item: OptionItem) => void;
   placeholder: string;
+  defaultValue: string;
 }
 
 export default function Dropdown({
   data,
   onChange,
   placeholder,
+  defaultValue,
 }: DropDownProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -46,6 +48,13 @@ export default function Dropdown({
     // eslint-disable-next-line prettier/prettier
     [onChange]
   );
+
+  useEffect(() => {
+    if (defaultValue) {
+      setValue(defaultValue);
+    }
+  }, [defaultValue])
+  
   return (
     <View
       ref={buttonRef}

@@ -53,8 +53,8 @@ export default function Dropdown({
     if (defaultValue) {
       setValue(defaultValue);
     }
-  }, [defaultValue])
-  
+  }, [defaultValue]);
+
   return (
     <View
       ref={buttonRef}

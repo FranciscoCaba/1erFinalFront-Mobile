@@ -1,9 +1,16 @@
 import { Stack, useLocalSearchParams, router } from "expo-router";
-import { Pressable, StyleSheet, Text, TextInput, View, Image } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Image,
+} from "react-native";
 import { Screen } from "../../components/mios/Screen";
 import { useEffect, useState } from "react";
 import { editCategoria, getOneCategoria } from "../../lib/backend";
-import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from "expo-image-picker";
 
 export default function EditarCategoria() {
   const params = useLocalSearchParams();
@@ -13,14 +20,14 @@ export default function EditarCategoria() {
   const pickImage = async () => {
     // Solicitar permisos
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Se necesitan permisos para acceder a la galería');
+    if (status !== "granted") {
+      alert("Se necesitan permisos para acceder a la galería");
       return;
     }
 
     // Abrir selector de imágenes
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
@@ -32,11 +39,11 @@ export default function EditarCategoria() {
   };
 
   useEffect(() => {
-    getOneCategoria(params.id).then(res => {
+    getOneCategoria(params.id).then((res) => {
       setNombre(res.nombre);
       setIcono(res.icono);
-    })
-  }, [])
+    });
+  }, []);
 
   const editar = () => {
     editCategoria({ id: params.id, nombre, icono });
@@ -71,10 +78,7 @@ export default function EditarCategoria() {
 
         {icono && (
           <View style={styles.imageView}>
-            <Image
-              source={{ uri: icono }}
-              style={styles.imagePreview}
-            />
+            <Image source={{ uri: icono }} style={styles.imagePreview} />
           </View>
         )}
 
@@ -131,7 +135,7 @@ const styles = StyleSheet.create({
   imagePreview: {
     width: 150,
     height: 150,
-    alignSelf: 'center',
+    alignSelf: "center",
     marginVertical: 10,
     borderRadius: 8,
   },
@@ -141,5 +145,5 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     backgroundColor: "lightgray",
     borderRadius: 25,
-  }
+  },
 });

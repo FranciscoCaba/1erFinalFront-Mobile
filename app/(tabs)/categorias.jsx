@@ -65,7 +65,7 @@ export default function Categoria() {
       </Link>
 
       <View style={styles.filas}>
-        <View style={[styles.celda, {flex: 0.5}]}>
+        <View style={[styles.celda, { flex: 0.5 }]}>
           <Text
             style={[
               styles.texto,
@@ -75,7 +75,7 @@ export default function Categoria() {
             {"ID"}
           </Text>
         </View>
-        <View style={[styles.celda, {flex: 0.5}]}>
+        <View style={[styles.celda, { flex: 0.5 }]}>
           <Text
             style={[
               styles.texto,
@@ -122,16 +122,16 @@ export default function Categoria() {
           renderItem={({ item }) =>
             item.activo ? (
               <View style={styles.filas}>
-                <View style={[styles.celda, {flex: 0.5}]}>
+                <View style={[styles.celda, { flex: 0.5 }]}>
                   <Text style={[styles.texto]}>{item.id}</Text>
                 </View>
-                <View style={[styles.celda, {flex: 0.5}]}>
+                <View style={[styles.celda, { flex: 0.5 }]}>
                   <Image
                     source={{ uri: item.icono }}
                     style={styles.iconoPreview}
                   />
                 </View>
-                <View style={[styles.celda, {flex: 1}]}>
+                <View style={[styles.celda, { flex: 1 }]}>
                   <Text style={[styles.texto]}>{item.nombre}</Text>
                 </View>
                 <Link
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   iconoPreview: {
     width: 25,
     height: 25,
-    alignSelf: 'center',
+    alignSelf: "center",
     borderRadius: 8,
   },
 });

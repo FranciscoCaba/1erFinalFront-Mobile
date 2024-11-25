@@ -134,19 +134,31 @@ export function Main() {
           renderItem={({ item }) =>
             item.activo ? (
               <View style={styles.filas}>
-                <View style={[styles.celda, { flex: 1, display: "flex", flexDirection: "row"}]}>
+                <View
+                  style={[
+                    styles.celda,
+                    { flex: 1, display: "flex", flexDirection: "row" },
+                  ]}
+                >
                   <Image
                     source={{ uri: item.imagen }}
-                    style={[styles.image, {marginLeft: 4}]}
+                    style={[styles.image, { marginLeft: 4 }]}
                   />
-                  <Text style={[styles.texto, {flex: 3, marginRight: 4}]}>{item.nombre}</Text>
+                  <Text style={[styles.texto, { flex: 3, marginRight: 4 }]}>
+                    {item.nombre}
+                  </Text>
                 </View>
-                <View style={[styles.celda, { flex: 1, display: "flex", flexDirection: "row"}]}>
+                <View
+                  style={[
+                    styles.celda,
+                    { flex: 1, display: "flex", flexDirection: "row" },
+                  ]}
+                >
                   <Image
                     source={{ uri: categorias[item.idCategoria].icono }}
-                    style={[styles.icono, {marginLeft: 4}]}
+                    style={[styles.icono, { marginLeft: 4 }]}
                   />
-                  <Text style={[styles.texto, {flex: 3, marginRight: 4}]}>
+                  <Text style={[styles.texto, { flex: 3, marginRight: 4 }]}>
                     {categorias[item.idCategoria].nombre}
                   </Text>
                 </View>
@@ -154,7 +166,7 @@ export function Main() {
                   <Text style={[styles.texto]}>{item.precioVenta}</Text>
                 </View>
                 <Link
-                  style={[styles.celda, {flex: 0.5}]}
+                  style={[styles.celda, { flex: 0.5 }]}
                   asChild
                   href={{
                     pathname: "/carrito/agregar",

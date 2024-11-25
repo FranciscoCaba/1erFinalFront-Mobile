@@ -1,9 +1,16 @@
 import { router, Stack } from "expo-router";
-import { Pressable, StyleSheet, Text, TextInput, View, Image } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Image,
+} from "react-native";
 import { Screen } from "../../components/mios/Screen";
 import { useState } from "react";
 import { addCategoria } from "../../lib/backend";
-import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from "expo-image-picker";
 
 export default function CrearCategoria() {
   const [nombre, setNombre] = useState("");
@@ -12,14 +19,14 @@ export default function CrearCategoria() {
   const pickImage = async () => {
     // Solicitar permisos
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Se necesitan permisos para acceder a la galería');
+    if (status !== "granted") {
+      alert("Se necesitan permisos para acceder a la galería");
       return;
     }
 
     // Abrir selector de imágenes
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
@@ -60,12 +67,7 @@ export default function CrearCategoria() {
           <Text style={styles.buttonText}>Seleccionar Icono</Text>
         </Pressable>
 
-        {icono && (
-          <Image
-            source={{ uri: icono }}
-            style={styles.imagePreview}
-          />
-        )}
+        {icono && <Image source={{ uri: icono }} style={styles.imagePreview} />}
 
         <Pressable
           onPressOut={() => crear()}
@@ -121,7 +123,7 @@ const styles = StyleSheet.create({
   imagePreview: {
     width: 150,
     height: 150,
-    alignSelf: 'center',
+    alignSelf: "center",
     marginVertical: 10,
     borderRadius: 8,
   },

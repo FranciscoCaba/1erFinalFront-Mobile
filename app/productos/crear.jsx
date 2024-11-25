@@ -1,10 +1,17 @@
 import { router, Stack } from "expo-router";
-import { Image, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { Screen } from "../../components/mios/Screen";
 import { useEffect, useState } from "react";
 import { addProducto, getCategorias } from "../../lib/backend";
 import Dropdown from "../../components/mios/Dropdown";
-import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from "expo-image-picker";
 
 export default function CrearProducto() {
   const [nombre, setNombre] = useState("");
@@ -17,14 +24,14 @@ export default function CrearProducto() {
   const pickImage = async () => {
     // Solicitar permisos
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Se necesitan permisos para acceder a la galería');
+    if (status !== "granted") {
+      alert("Se necesitan permisos para acceder a la galería");
       return;
     }
 
     // Abrir selector de imágenes
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [3, 4],
       quality: 1,
@@ -36,12 +43,12 @@ export default function CrearProducto() {
   };
 
   const crear = () => {
-    addProducto({ 
-      nombre, 
-      precioVenta, 
+    addProducto({
+      nombre,
+      precioVenta,
       idCategoria: selectedCategoria.value,
       imagen: imagen,
-      stock
+      stock,
     });
     router.back();
   };
@@ -98,10 +105,7 @@ export default function CrearProducto() {
         </Pressable>
 
         {imagen && (
-          <Image
-            source={{ uri: imagen }}
-            style={styles.imagePreview}
-          />
+          <Image source={{ uri: imagen }} style={styles.imagePreview} />
         )}
 
         <Text style={styles.texto}>Ingrese el stock:</Text>
@@ -166,7 +170,7 @@ const styles = StyleSheet.create({
   imagePreview: {
     width: 150,
     height: 200,
-    alignSelf: 'center',
+    alignSelf: "center",
     marginVertical: 10,
     borderRadius: 8,
   },

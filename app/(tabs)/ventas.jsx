@@ -44,9 +44,7 @@ export default function SalesScreen() {
   return (
     <Screen>
       <View style={[styles.searchContainer]}>
-        <Text style={styles.textoBlanco}>
-          Tipo de Operación:
-        </Text>
+        <Text style={styles.textoBlanco}>Tipo de Operación:</Text>
       </View>
       <View style={[styles.filterContainer, { marginTop: 0 }]}>
         <View style={styles.filterOption}>
@@ -76,11 +74,9 @@ export default function SalesScreen() {
       </View>
 
       <View style={[styles.searchContainer]}>
-        <Text style={styles.textoBlanco}>
-          Filtrar por:
-        </Text>
+        <Text style={styles.textoBlanco}>Filtrar por:</Text>
       </View>
-      <View style={[styles.filterContainer, {marginTop: 0}]}>
+      <View style={[styles.filterContainer, { marginTop: 0 }]}>
         <View style={styles.filterOption}>
           <RadioButton
             value="fecha"
@@ -117,22 +113,33 @@ export default function SalesScreen() {
 
       <View style={[styles.filas, { marginTop: 15 }]}>
         <View style={[styles.celda, { flex: 1.5 }]}>
-          <Text style={[styles.texto, { fontWeight: "bold", fontStyle: "italic" }]}>
+          <Text
+            style={[styles.texto, { fontWeight: "bold", fontStyle: "italic" }]}
+          >
             Fecha
           </Text>
         </View>
         <View style={[styles.celda, { flex: 1 }]}>
-          <Text style={[styles.texto, { fontWeight: "bold", fontStyle: "italic" }]}>
+          <Text
+            style={[styles.texto, { fontWeight: "bold", fontStyle: "italic" }]}
+          >
             Total
           </Text>
         </View>
         <View style={[styles.celda, { flex: 1 }]}>
-          <Text style={[styles.texto, { fontWeight: "bold", fontStyle: "italic", textAlign: "center" }]}>
+          <Text
+            style={[
+              styles.texto,
+              { fontWeight: "bold", fontStyle: "italic", textAlign: "center" },
+            ]}
+          >
             Tipo de Operación
           </Text>
         </View>
         <View style={[styles.celda, { flex: 2 }]}>
-          <Text style={[styles.texto, { fontWeight: "bold", fontStyle: "italic" }]}>
+          <Text
+            style={[styles.texto, { fontWeight: "bold", fontStyle: "italic" }]}
+          >
             Cliente
           </Text>
         </View>

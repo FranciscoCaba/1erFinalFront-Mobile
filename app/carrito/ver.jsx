@@ -96,14 +96,14 @@ export default function VerCarrito() {
       if (tipoOperacion === "Delivery") {
         ventaData.venta = {
           ...ventaData.venta,
-          direccion
-        }
+          direccion,
+        };
       }
 
       // Guardar la venta
       guardarVenta(ventaData);
 
-      console.log(ventaData)
+      console.log(ventaData);
 
       Alert.alert("Éxito", "La orden ha sido finalizada correctamente", [
         {
@@ -166,7 +166,9 @@ export default function VerCarrito() {
             />
           </>
         )}
-        <Text style={[styles.textoBlanco, {marginBottom: 0}]}>Tipo de Operación: </Text>
+        <Text style={[styles.textoBlanco, { marginBottom: 0 }]}>
+          Tipo de Operación:{" "}
+        </Text>
         <View style={styles.tipoOperacionContainer}>
           <View style={styles.tipoOperacion}>
             <RadioButton
@@ -185,32 +187,35 @@ export default function VerCarrito() {
             <Text style={styles.tipoOperacionText}>Delivery</Text>
           </View>
         </View>
-        {
-          tipoOperacion === "Delivery" ?
-            <View>
-              <Text style={styles.textoBlanco}>Dirección:</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ingrese su dirección"
-                value={direccion}
-                onChangeText={setDireccion}
-                placeholderTextColor="#666"
-              />
-            </View>
-            :
-            ""
-        }
+        {tipoOperacion === "Delivery" ? (
+          <View>
+            <Text style={styles.textoBlanco}>Dirección:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ingrese su dirección"
+              value={direccion}
+              onChangeText={setDireccion}
+              placeholderTextColor="#666"
+            />
+          </View>
+        ) : (
+          ""
+        )}
       </View>
 
       <View style={[styles.filas, { marginTop: 10 }]}>
         <View style={[styles.celda, { flex: 1 }]}>
-          <Text style={[styles.texto, {fontWeight: "bold"}]}>{"Producto"}</Text>
+          <Text style={[styles.texto, { fontWeight: "bold" }]}>
+            {"Producto"}
+          </Text>
         </View>
         <View style={[styles.celda, { flex: 1 }]}>
-          <Text style={[styles.texto, {fontWeight: "bold"}]}>{"Cantidad"}</Text>
+          <Text style={[styles.texto, { fontWeight: "bold" }]}>
+            {"Cantidad"}
+          </Text>
         </View>
         <View style={[styles.celda, { flex: 1 }]}>
-          <Text style={[styles.texto, {fontWeight: "bold"}]}>{"Precio"}</Text>
+          <Text style={[styles.texto, { fontWeight: "bold" }]}>{"Precio"}</Text>
         </View>
       </View>
 
@@ -329,5 +334,5 @@ const styles = StyleSheet.create({
   tipoOperacionText: {
     color: "white",
     fontSize: 16,
-  }
+  },
 });

@@ -1,9 +1,21 @@
 import { Stack, useLocalSearchParams, router } from "expo-router";
-import { Pressable, StyleSheet, Text, TextInput, View, Image } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Image,
+} from "react-native";
 import { Screen } from "../../components/mios/Screen";
 import { useEffect, useState } from "react";
-import { editProducto, getCategorias, getOneCategoria, getOneProducto } from "../../lib/backend";
-import * as ImagePicker from 'expo-image-picker';
+import {
+  editProducto,
+  getCategorias,
+  getOneCategoria,
+  getOneProducto,
+} from "../../lib/backend";
+import * as ImagePicker from "expo-image-picker";
 import Dropdown from "../../components/mios/Dropdown";
 
 export default function EditarProducto() {
@@ -18,14 +30,14 @@ export default function EditarProducto() {
   const pickImage = async () => {
     // Solicitar permisos
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Se necesitan permisos para acceder a la galería');
+    if (status !== "granted") {
+      alert("Se necesitan permisos para acceder a la galería");
       return;
     }
 
     // Abrir selector de imágenes
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+      mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [3, 4],
       quality: 1,
@@ -49,20 +61,18 @@ export default function EditarProducto() {
   };
 
   useEffect(() => {
-
-    getOneProducto(params.id).then(res => {
+    getOneProducto(params.id).then((res) => {
       setNombre(res.nombre);
       setImagen(res.imagen);
       setPrecioVenta(res.precioVenta);
       setStock(res.stock);
-      getOneCategoria(res.idCategoria).then(res => {
+      getOneCategoria(res.idCategoria).then((res) => {
         setSelectedCategoria({
           value: res.id,
-          label: res.nombre
-        })
+          label: res.nombre,
+        });
       });
     });
-
 
     setCategorias(
       getCategorias().map((val) => {
@@ -117,10 +127,7 @@ export default function EditarProducto() {
         </Pressable>
 
         {imagen && (
-          <Image
-            source={{ uri: imagen }}
-            style={styles.imagePreview}
-          />
+          <Image source={{ uri: imagen }} style={styles.imagePreview} />
         )}
 
         <Text style={styles.texto}>Ingrese el stock:</Text>
@@ -185,7 +192,7 @@ const styles = StyleSheet.create({
   imagePreview: {
     width: 150,
     height: 200,
-    alignSelf: 'center',
+    alignSelf: "center",
     marginVertical: 10,
     borderRadius: 8,
   },

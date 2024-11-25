@@ -178,14 +178,14 @@ export default function Producto() {
                 <View style={[styles.celda, { flex: 1 }]}>
                   <Text style={[styles.texto]}>{item.stock}</Text>
                 </View>
-                
+
                 <Link
                   asChild
                   style={[styles.celda, { flex: 0.5 }]}
                   href={{
                     pathname: "/productos/editar",
                     params: {
-                      id: item.id
+                      id: item.id,
                     },
                   }}
                 >
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   imagePreview: {
     width: 45,
     height: 60,
-    alignSelf: 'center',
+    alignSelf: "center",
     borderRadius: 8,
   },
 });

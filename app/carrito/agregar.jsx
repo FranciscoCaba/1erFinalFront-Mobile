@@ -2,14 +2,18 @@ import { Stack, useLocalSearchParams, router } from "expo-router";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Screen } from "../../components/mios/Screen";
 import { useEffect, useState } from "react";
-import { addProductoCarrito, getOneProducto, tieneStock } from "../../lib/backend";
+import {
+  addProductoCarrito,
+  getOneProducto,
+  tieneStock,
+} from "../../lib/backend";
 
 export default function AgregarACarrito() {
   const params = useLocalSearchParams();
   const [cantidad, setCantidad] = useState(0);
   const [producto, setProducto] = useState({});
 
-  const agregar = () => {    
+  const agregar = () => {
     if (cantidad > 0 && tieneStock(params.id, cantidad)) {
       addProductoCarrito({
         id: params.id,
@@ -18,16 +22,16 @@ export default function AgregarACarrito() {
       });
       router.back();
     } else if (cantidad <= 0) {
-      alert("La cantidad debe ser mayor o igual a 0")
+      alert("La cantidad debe ser mayor o igual a 0");
     } else {
-      alert("Stock Insuficiente")
+      alert("Stock Insuficiente");
     }
   };
 
   useEffect(() => {
-    getOneProducto(params.id).then( res => {
+    getOneProducto(params.id).then((res) => {
       setProducto(res);
-    })
+    });
   }, []);
 
   return (

@@ -2,25 +2,33 @@ import { Stack, useLocalSearchParams, router } from "expo-router";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Screen } from "../../components/mios/Screen";
 import { useEffect, useState } from "react";
-import { addProductoCarrito, getOneProducto } from "../../lib/backend";
+import { addProductoCarrito, getOneProducto, tieneStock } from "../../lib/backend";
 
 export default function AgregarACarrito() {
   const params = useLocalSearchParams();
   const [cantidad, setCantidad] = useState(0);
   const [producto, setProducto] = useState({});
 
-  const agregar = () => {
-    addProductoCarrito({
-      id: params.id,
-      cantidad: parseInt(cantidad),
-      precio: producto.precioVenta * parseInt(cantidad),
-    });
-    router.back();
+  const agregar = () => {    
+    if (cantidad > 0 && tieneStock(params.id, cantidad)) {
+      addProductoCarrito({
+        id: params.id,
+        cantidad: parseInt(cantidad),
+        precio: producto.precioVenta * parseInt(cantidad),
+      });
+      router.back();
+    } else if (cantidad <= 0) {
+      alert("La cantidad debe ser mayor o igual a 0")
+    } else {
+      alert("Stock Insuficiente")
+    }
   };
 
   useEffect(() => {
-    setProducto(getOneProducto(params.id));
-  }, [params]);
+    getOneProducto(params.id).then( res => {
+      setProducto(res);
+    })
+  }, []);
 
   return (
     <Screen>
@@ -31,6 +39,9 @@ export default function AgregarACarrito() {
           headerTitle: "Agregar a Carrito",
         }}
       />
+      <View style={styles.container}>
+        <Text style={styles.texto}>Stock Disponible: {producto.stock}</Text>
+      </View>
       <View style={styles.container}>
         <Text style={styles.texto}>Cantidad:</Text>
         <TextInput

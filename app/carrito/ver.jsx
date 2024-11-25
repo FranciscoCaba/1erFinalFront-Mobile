@@ -20,6 +20,7 @@ import {
   getOneCliente,
   resetCarrito,
 } from "../../lib/backend";
+import { RadioButton } from "react-native-paper";
 
 export default function VerCarrito() {
   const [carrito, setCarrito] = useState([]);
@@ -29,6 +30,8 @@ export default function VerCarrito() {
   const [apellido, setApellido] = useState("");
   const [showClientForm, setShowClientForm] = useState(false);
   const [total, setTotal] = useState(0);
+  const [tipoOperacion, setTipoOperacion] = useState("");
+  const [direccion, setDireccion] = useState("");
 
   useEffect(() => {
     setProductos(getProductos());
@@ -85,12 +88,22 @@ export default function VerCarrito() {
         })),
         venta: {
           idCliente: cliente.id,
-          total: total,
+          total,
+          tipoOperacion,
         },
       };
 
+      if (tipoOperacion === "Delivery") {
+        ventaData.venta = {
+          ...ventaData.venta,
+          direccion
+        }
+      }
+
       // Guardar la venta
       guardarVenta(ventaData);
+
+      console.log(ventaData)
 
       Alert.alert("Éxito", "La orden ha sido finalizada correctamente", [
         {
@@ -102,6 +115,8 @@ export default function VerCarrito() {
             setCedula("");
             setNombre("");
             setApellido("");
+            setDireccion("");
+            setTipoOperacion("");
             resetCarrito();
             router.back();
           },
@@ -151,17 +166,51 @@ export default function VerCarrito() {
             />
           </>
         )}
+        <Text style={[styles.textoBlanco, {marginBottom: 0}]}>Tipo de Operación: </Text>
+        <View style={styles.tipoOperacionContainer}>
+          <View style={styles.tipoOperacion}>
+            <RadioButton
+              value="PickUp"
+              status={tipoOperacion === "PickUp" ? "checked" : "unchecked"}
+              onPress={() => setTipoOperacion("PickUp")}
+            />
+            <Text style={styles.tipoOperacionText}>Pickup</Text>
+          </View>
+          <View style={styles.tipoOperacion}>
+            <RadioButton
+              value="Delivery"
+              status={tipoOperacion === "Delivery" ? "checked" : "unchecked"}
+              onPress={() => setTipoOperacion("Delivery")}
+            />
+            <Text style={styles.tipoOperacionText}>Delivery</Text>
+          </View>
+        </View>
+        {
+          tipoOperacion === "Delivery" ?
+            <View>
+              <Text style={styles.textoBlanco}>Dirección:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Ingrese su dirección"
+                value={direccion}
+                onChangeText={setDireccion}
+                placeholderTextColor="#666"
+              />
+            </View>
+            :
+            ""
+        }
       </View>
 
       <View style={[styles.filas, { marginTop: 10 }]}>
         <View style={[styles.celda, { flex: 1 }]}>
-          <Text style={[styles.texto]}>{"Producto"}</Text>
+          <Text style={[styles.texto, {fontWeight: "bold"}]}>{"Producto"}</Text>
         </View>
         <View style={[styles.celda, { flex: 1 }]}>
-          <Text style={[styles.texto]}>{"Cantidad"}</Text>
+          <Text style={[styles.texto, {fontWeight: "bold"}]}>{"Cantidad"}</Text>
         </View>
         <View style={[styles.celda, { flex: 1 }]}>
-          <Text style={[styles.texto]}>{"Precio"}</Text>
+          <Text style={[styles.texto, {fontWeight: "bold"}]}>{"Precio"}</Text>
         </View>
       </View>
 
@@ -213,6 +262,11 @@ const styles = StyleSheet.create({
     color: "black",
     fontSize: 12,
   },
+  textoBlanco: {
+    color: "white",
+    marginBottom: 5,
+    fontSize: 20,
+  },
   filas: {
     width: "90%",
     backgroundColor: "white",
@@ -262,4 +316,18 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "right",
   },
+  tipoOperacionContainer: {
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    marginVertical: 10,
+  },
+  tipoOperacion: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 10,
+  },
+  tipoOperacionText: {
+    color: "white",
+    fontSize: 16,
+  }
 });

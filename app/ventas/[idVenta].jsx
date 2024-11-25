@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { Screen } from "../../components/mios/Screen";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { FlatList, StyleSheet, Text, View } from "react-native";
-import { getDetallesVenta, getProductos } from "../../lib/backend";
+import { getDetallesVenta, getProductos, getVenta } from "../../lib/backend";
 
 export default function SaleDetailsScreen() {
   const { idVenta } = useLocalSearchParams();
   const [saleDetails, setSaleDetails] = useState([]);
   const [productos, setProductos] = useState([]);
+  const [venta, setVenta] = useState({});
 
   useEffect(() => {
     setProductos(getProductos());
@@ -16,6 +17,7 @@ export default function SaleDetailsScreen() {
 
   const fetchSaleDetails = () => {
     const data = getDetallesVenta(idVenta);
+    setVenta(getVenta(idVenta));
 
     setSaleDetails(data);
   };
@@ -29,6 +31,30 @@ export default function SaleDetailsScreen() {
           headerTitle: "Detalles de Venta",
         }}
       />
+      
+      <View style={styles.container}>
+        <View style={{flexDirection: "row", justifyContent: ""}}>
+          <Text style={[styles.textoBlanco,
+                        {
+                          textDecorationLine: "underline",
+                          fontWeight: "bold"
+                          }]}>Tipo Operación</Text>
+          <Text style={[styles.textoBlanco]}>: {venta.tipoOperacion}</Text>
+        </View>
+        {
+          venta.tipoOperacion === "PickUp" ?
+          ""
+          :
+          <View style={{flexDirection: "row", justifyContent: ""}}>
+            <Text style={[styles.textoBlanco,
+                          {
+                            textDecorationLine: "underline",
+                            fontWeight: "bold"
+                            }]}>Dirección</Text>
+            <Text style={[styles.textoBlanco]}>: {venta.direccion}</Text>
+          </View>
+        }
+      </View>
 
       <View style={[styles.filas, { marginTop: 15 }]}>
         <View style={[styles.celda, { flex: 1 }]}>
@@ -94,6 +120,16 @@ const styles = StyleSheet.create({
   texto: {
     color: "black",
     fontSize: 16,
+  },
+  textoBlanco: {
+    color: "white",
+    marginBottom: 5,
+    fontSize: 20,
+  },
+  container: {
+    width: "90%",
+    alignSelf: "center",
+    marginTop: 10,
   },
   filas: {
     width: "90%",

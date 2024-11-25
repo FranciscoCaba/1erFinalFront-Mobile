@@ -12,6 +12,7 @@ import { Screen } from "../../components/mios/Screen";
 import { Stack, useRouter } from "expo-router";
 import { filtrarVenta, getClientes } from "../../lib/backend";
 import { RadioButton } from "react-native-paper";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function SalesScreen() {
   const router = useRouter();
@@ -19,17 +20,22 @@ export default function SalesScreen() {
   const [filterOption, setFilterOption] = useState("fecha");
   const [filterValue, setFilterValue] = useState("");
   const [clientes, setClientes] = useState([]);
+  const [operationType, setOperationType] = useState("todos");
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     fetchSales();
     setClientes(getClientes());
-  }, [filterOption, filterValue]);
+  }, [isFocused]);
 
   const fetchSales = () => {
-    const data = filtrarVenta(filterOption, filterValue);
-
+    const data = filtrarVenta(filterOption, filterValue, operationType);
     setSales(data || []);
   };
+
+  useEffect(() => {
+    fetchSales();
+  }, [filterValue, filterOption, operationType]);
 
   const handleSalePress = (sale) => {
     router.push(`/ventas/${sale.idVenta}`);
@@ -37,14 +43,51 @@ export default function SalesScreen() {
 
   return (
     <Screen>
-      <View style={styles.filterContainer}>
+      <View style={[styles.searchContainer]}>
+        <Text style={styles.textoBlanco}>
+          Tipo de Operación:
+        </Text>
+      </View>
+      <View style={[styles.filterContainer, { marginTop: 0 }]}>
+        <View style={styles.filterOption}>
+          <RadioButton
+            value="todos"
+            status={operationType === "todos" ? "checked" : "unchecked"}
+            onPress={() => setOperationType("todos")}
+          />
+          <Text style={styles.filterText}>Todos</Text>
+        </View>
+        <View style={styles.filterOption}>
+          <RadioButton
+            value="PickUp"
+            status={operationType === "PickUp" ? "checked" : "unchecked"}
+            onPress={() => setOperationType("PickUp")}
+          />
+          <Text style={styles.filterText}>PickUp</Text>
+        </View>
+        <View style={styles.filterOption}>
+          <RadioButton
+            value="Delivery"
+            status={operationType === "Delivery" ? "checked" : "unchecked"}
+            onPress={() => setOperationType("Delivery")}
+          />
+          <Text style={styles.filterText}>Delivery</Text>
+        </View>
+      </View>
+
+      <View style={[styles.searchContainer]}>
+        <Text style={styles.textoBlanco}>
+          Filtrar por:
+        </Text>
+      </View>
+      <View style={[styles.filterContainer, {marginTop: 0}]}>
         <View style={styles.filterOption}>
           <RadioButton
             value="fecha"
             status={filterOption === "fecha" ? "checked" : "unchecked"}
             onPress={() => setFilterOption("fecha")}
           />
-          <Text style={styles.filterText}>Filtrar por Fecha</Text>
+          <Text style={styles.filterText}>Fecha</Text>
         </View>
         <View style={styles.filterOption}>
           <RadioButton
@@ -52,7 +95,7 @@ export default function SalesScreen() {
             status={filterOption === "cliente" ? "checked" : "unchecked"}
             onPress={() => setFilterOption("cliente")}
           />
-          <Text style={styles.filterText}>Filtrar por Cliente</Text>
+          <Text style={styles.filterText}>Cliente</Text>
         </View>
       </View>
 
@@ -73,26 +116,23 @@ export default function SalesScreen() {
       )}
 
       <View style={[styles.filas, { marginTop: 15 }]}>
-        <View style={[styles.celda, { flex: 1 }]}>
-          <Text
-            style={
-              ([styles.texto], { fontWeight: "bold", fontStyle: "italic" })
-            }
-          >
+        <View style={[styles.celda, { flex: 1.5 }]}>
+          <Text style={[styles.texto, { fontWeight: "bold", fontStyle: "italic" }]}>
             Fecha
           </Text>
         </View>
         <View style={[styles.celda, { flex: 1 }]}>
-          <Text
-            style={[styles.texto, { fontWeight: "bold", fontStyle: "italic" }]}
-          >
+          <Text style={[styles.texto, { fontWeight: "bold", fontStyle: "italic" }]}>
             Total
           </Text>
         </View>
+        <View style={[styles.celda, { flex: 1 }]}>
+          <Text style={[styles.texto, { fontWeight: "bold", fontStyle: "italic", textAlign: "center" }]}>
+            Tipo de Operación
+          </Text>
+        </View>
         <View style={[styles.celda, { flex: 2 }]}>
-          <Text
-            style={[styles.texto, { fontWeight: "bold", fontStyle: "italic" }]}
-          >
+          <Text style={[styles.texto, { fontWeight: "bold", fontStyle: "italic" }]}>
             Cliente
           </Text>
         </View>
@@ -105,11 +145,14 @@ export default function SalesScreen() {
           item ? (
             <Pressable onPress={() => handleSalePress(item)}>
               <View style={styles.filas}>
-                <View style={[styles.celda, { flex: 1 }]}>
+                <View style={[styles.celda, { flex: 1.5 }]}>
                   <Text style={[styles.texto]}>{item.fecha}</Text>
                 </View>
                 <View style={[styles.celda, { flex: 1 }]}>
                   <Text style={[styles.texto]}>{item.total}</Text>
+                </View>
+                <View style={[styles.celda, { flex: 1 }]}>
+                  <Text style={[styles.texto]}>{item.tipoOperacion}</Text>
                 </View>
                 <View style={[styles.celda, { flex: 2 }]}>
                   <Text style={[styles.texto]}>
@@ -119,9 +162,7 @@ export default function SalesScreen() {
                 </View>
               </View>
             </Pressable>
-          ) : (
-            ""
-          )
+          ) : null
         }
       />
     </Screen>
@@ -142,6 +183,10 @@ const styles = StyleSheet.create({
   },
   texto: {
     color: "black",
+    fontSize: 16,
+  },
+  textoBlanco: {
+    color: "white",
     fontSize: 16,
   },
   filas: {
@@ -175,7 +220,7 @@ const styles = StyleSheet.create({
   },
   filterContainer: {
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-around",
     marginVertical: 10,
   },
   filterOption: {
